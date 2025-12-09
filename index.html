@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untitled Innovations | We Build The Future</title>
+    
+    <!-- Fonts: JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+    
+    <!-- Icons: FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        terminal: '#00FF94',
+                        code: '#7B61FF',
+                        ghost: '#EDEDED',
+                        surface: '#0A0A0A'
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 5px #00FF94, 0 0 10px #00FF94',
+                        'neon-purple': '0 0 5px #7B61FF, 0 0 15px #7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom "Vibe" CSS */
+        body {
+            background-color: #050505;
+            color: #EDEDED;
+            overflow-x: hidden;
+        }
+
+        /* Selection Color */
+        ::selection {
+            background: #00FF94;
+            color: #050505;
+        }
+
+        /* Blinking Cursor Animation */
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .cursor-blink::after {
+            content: '_';
+            animation: blink 1s step-end infinite;
+            color: #00FF94;
+        }
+
+        /* CRT Scanline Effect Overlay */
+        .crt::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 50;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Button Hover Glitch/Glow Transition */
+        .btn-terminal {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-terminal:hover {
+            box-shadow: 0 0 15px #00FF94;
+            text-shadow: 0 0 5px #00FF94;
+            transform: translateY(-2px);
+        }
+
+        /* Service Card Hover */
+        .service-card {
+            transition: all 0.3s ease;
+        }
+        .service-card:hover {
+            border-color: #00FF94;
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(0, 255, 148, 0.1);
+        }
+        .service-card:hover i {
+            color: #00FF94;
+            filter: drop-shadow(0 0 5px #00FF94);
+        }
+
+        /* Scrollbar Customization */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050505; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border: 1px solid #050505;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00FF94; 
+        }
+    </style>
+</head>
+<body class="font-mono text-ghost crt antialiased relative">
+
+    <!-- Background Grid Lines (Subtle) -->
+    <div class="fixed inset-0 z-0 opacity-10 pointer-events-none" 
+         style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px;">
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 top-0 bg-void/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="#" class="text-xl font-bold tracking-tighter hover:text-terminal transition-colors">
+                        <span class="text-terminal">></span> Untitled Innovations<span class="cursor-blink"></span>
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#services" class="text-sm font-medium text-gray-400 hover:text-terminal transition-colors duration-300">./Services</a>
+                        <a href="#about" class="text-sm font-medium text-gray-400 hover:text-terminal transition-colors duration-300">./About</a>
+                        <a href="#contact" class="text-sm font-medium text-gray-400 hover:text-terminal transition-colors duration-300">./Contact</a>
+                    </div>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMenu()" class="text-gray-400 hover:text-terminal focus:outline-none">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-surface border-b border-white/10 absolute w-full">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#services" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-terminal hover:bg-white/5">./Services</a>
+                <a href="#about" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-terminal hover:bg-white/5">./About</a>
+                <a href="#contact" class="block px-3 py-2 text-base font-medium text-gray-400 hover:text-terminal hover:bg-white/5">./Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-20">
+        
+        <!-- Hero Section -->
+        <section class="relative min-h-[90vh] flex flex-col items-center justify-center px-4 text-center">
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-code border border-code/30 rounded-full bg-code/10 mb-4 animate-pulse">
+                    SYSTEM_STATUS: ONLINE
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+                    <span id="typewriter" class="bg-clip-text text-transparent bg-gradient-to-r from-ghost via-white to-gray-400"></span>
+                    <span class="animate-pulse text-terminal">|</span>
+                </h1>
+                
+                <p class="mt-4 text-lg md:text-xl text-gray-400 max-w-2xl mx-auto">
+                    Micro-SaaS, Mobile Apps, and Enterprise Solutions engineered for the modern web.
+                </p>
+
+                <div class="pt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <button class="btn-terminal group relative px-8 py-4 bg-transparent border-2 border-terminal text-terminal font-bold uppercase tracking-widest text-sm hover:bg-terminal hover:text-void overflow-hidden">
+                        <span class="relative z-10">> Initialize_Project</span>
+                    </button>
+                    
+                    <button class="px-8 py-4 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+                        Read Documentation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scroll Indicator -->
+            <div class="absolute bottom-10 animate-bounce">
+                <span class="text-gray-500 text-xs uppercase tracking-widest">Scroll_Down</span>
+                <div class="w-[1px] h-8 bg-terminal mx-auto mt-2"></div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="mb-16">
+                    <h2 class="text-3xl font-bold text-ghost mb-4"><span class="text-terminal">function</span> getServices() {</h2>
+                    <p class="text-gray-400 max-w-2xl border-l-2 border-code pl-4 italic">
+                        Deploying scalable solutions across multiple environments.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    
+                    <!-- Service 1 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-layer-group text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Cross-Platform Dev</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Unified codebases running seamlessly on web, mobile, and desktop environments.</p>
+                    </div>
+
+                    <!-- Service 2 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-mobile-screen text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Native Mobile Apps</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">High-performance iOS and Android applications built with native technologies.</p>
+                    </div>
+
+                    <!-- Service 3 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-brands fa-flutter text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Flutter Development</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Expressive UIs and rapid development cycles using Google's UI toolkit.</p>
+                    </div>
+
+                    <!-- Service 4 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-cloud text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Zoho Solutions</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Custom implementation and automation of the Zoho One business suite.</p>
+                    </div>
+
+                    <!-- Service 5 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-cart-shopping text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Zoho Commerce</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Tailored storefronts and inventory management powered by Zoho.</p>
+                    </div>
+
+                    <!-- Service 6 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-store text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">E-commerce</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Full-stack e-commerce platforms focused on conversion and user experience.</p>
+                    </div>
+
+                    <!-- Service 7 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-globe text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Web Development</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Static SSG sites and dynamic web applications built for speed and SEO.</p>
+                    </div>
+
+                    <!-- Service 8 -->
+                    <div class="service-card p-6 border border-white/10 bg-surface/50 backdrop-blur-sm group">
+                        <div class="w-12 h-12 flex items-center justify-center rounded bg-void border border-white/10 mb-4 group-hover:border-terminal transition-colors">
+                            <i class="fa-solid fa-chalkboard-user text-code text-xl"></i>
+                        </div>
+                        <h3 class="text-lg font-bold mb-2 group-hover:text-terminal transition-colors">Corporate Training</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed">Upskilling teams in modern tech stacks and development best practices.</p>
+                    </div>
+
+                </div>
+                
+                <div class="mt-8 text-right text-gray-600 font-mono text-sm">
+                    } // End of Service Module
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section id="contact" class="py-20 border-t border-white/10 bg-gradient-to-b from-void to-surface">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to <span class="text-code">Execute</span>?</h2>
+                <p class="text-gray-400 mb-8 text-lg">Let's compile your ideas into reality. Our team is standing by.</p>
+                <form class="max-w-md mx-auto space-y-4">
+                    <div class="relative">
+                        <span class="absolute left-3 top-3 text-gray-500">></span>
+                        <input type="email" placeholder="enter_email_address" class="w-full bg-void border border-white/20 rounded-none py-3 pl-8 pr-4 text-ghost focus:border-terminal focus:outline-none focus:ring-1 focus:ring-terminal font-mono transition-all">
+                    </div>
+                    <button type="submit" class="w-full btn-terminal bg-terminal text-void font-bold py-3 uppercase tracking-widest hover:bg-white hover:text-void transition-colors">
+                        Send_Transmission
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-void py-8 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-xs text-gray-500">
+                &copy; 2025 Untitled Innovations. All Systems Operational.
+            </p>
+            <div class="flex space-x-6 text-gray-500 text-xs">
+                <span class="hover:text-terminal cursor-pointer">PRIVACY_PROTOCOL</span>
+                <span class="hover:text-terminal cursor-pointer">TERMS_OF_SERVICE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Typewriter Effect
+        const textToType = "We Build the Future, Untitled.";
+        const typeWriterElement = document.getElementById('typewriter');
+        let charIndex = 0;
+
+        function typeWriter() {
+            if (charIndex < textToType.length) {
+                typeWriterElement.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeWriter, 75); // Typing speed
+            }
+        }
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+
+        // Initialize animations on load
+        window.onload = function() {
+            // Start typing after a short delay
+            setTimeout(typeWriter, 500);
+        };
+    </script>
+</body>
+</html>

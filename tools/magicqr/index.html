@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic QR — Free QR Code Generator | Untitled Innovations</title>
+    <meta name="description" content="Generate stunning, customizable QR codes with logo overlay, custom colors, dot styles, and more. 100% free, 100% private — runs entirely in your browser.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        terminal: '#00FF94',
+                        code: '#7B61FF',
+                        ghost: '#EDEDED',
+                        surface: '#0A0A0A'
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 5px #00FF94, 0 0 10px #00FF94',
+                        'neon-purple': '0 0 5px #7B61FF, 0 0 15px #7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- QR Code Styling Library -->
+    <script src="https://unpkg.com/qr-code-styling@1.8.4/lib/qr-code-styling.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="font-mono text-ghost antialiased relative bg-void">
+
+    <!-- Background Grid -->
+    <div class="fixed inset-0 z-0 opacity-10 pointer-events-none"
+         style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 top-0 bg-void/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="/" class="text-lg font-bold tracking-tighter hover:text-terminal transition-colors">
+                    <span class="text-terminal">></span> Untitled Innovations
+                </a>
+                <div class="flex items-center gap-6">
+                    <span class="hidden sm:inline text-xs text-gray-500 border border-white/10 px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-lock text-terminal mr-1"></i> 100% Client-Side
+                    </span>
+                    <a href="/" class="text-sm text-gray-400 hover:text-terminal transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-20 pb-12 min-h-screen">
+        <!-- Hero -->
+        <div class="text-center px-4 pt-6 pb-8">
+            <h1 class="text-3xl md:text-5xl font-bold mb-3">
+                <span class="text-terminal">Magic</span> QR
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base max-w-xl mx-auto">
+                Generate beautiful, customizable QR codes with logos, custom styles, and colors. Free forever.
+            </p>
+        </div>
+
+        <!-- Tool Layout -->
+        <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-6">
+
+            <!-- LEFT: Controls Panel -->
+            <div class="lg:w-[420px] flex-shrink-0 space-y-4">
+
+                <!-- Content Type Tabs -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-keyboard mr-2"></i>Content Type</label>
+                    <div id="content-tabs" class="flex flex-wrap gap-2 mb-4">
+                        <button class="tab-btn active" data-tab="url">URL</button>
+                        <button class="tab-btn" data-tab="text">Text</button>
+                        <button class="tab-btn" data-tab="wifi">WiFi</button>
+                        <button class="tab-btn" data-tab="vcard">vCard</button>
+                        <button class="tab-btn" data-tab="email">Email</button>
+                        <button class="tab-btn" data-tab="sms">SMS</button>
+                    </div>
+
+                    <!-- Dynamic Input Forms -->
+                    <div id="input-url" class="tab-content active">
+                        <input type="url" id="qr-url" class="qr-input" placeholder="https://example.com" value="https://untitledinnovations.com">
+                    </div>
+                    <div id="input-text" class="tab-content">
+                        <textarea id="qr-text" class="qr-input h-24 resize-none" placeholder="Enter any text..."></textarea>
+                    </div>
+                    <div id="input-wifi" class="tab-content">
+                        <input type="text" id="wifi-ssid" class="qr-input mb-2" placeholder="Network Name (SSID)">
+                        <input type="password" id="wifi-pass" class="qr-input mb-2" placeholder="Password">
+                        <select id="wifi-enc" class="qr-input">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None</option>
+                        </select>
+                    </div>
+                    <div id="input-vcard" class="tab-content">
+                        <input type="text" id="vc-name" class="qr-input mb-2" placeholder="Full Name">
+                        <input type="tel" id="vc-phone" class="qr-input mb-2" placeholder="Phone Number">
+                        <input type="email" id="vc-email" class="qr-input mb-2" placeholder="Email">
+                        <input type="text" id="vc-org" class="qr-input" placeholder="Company">
+                    </div>
+                    <div id="input-email" class="tab-content">
+                        <input type="email" id="em-to" class="qr-input mb-2" placeholder="Recipient Email">
+                        <input type="text" id="em-sub" class="qr-input mb-2" placeholder="Subject">
+                        <textarea id="em-body" class="qr-input h-16 resize-none" placeholder="Message body..."></textarea>
+                    </div>
+                    <div id="input-sms" class="tab-content">
+                        <input type="tel" id="sms-num" class="qr-input mb-2" placeholder="Phone Number">
+                        <textarea id="sms-body" class="qr-input h-16 resize-none" placeholder="Message..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Dot Style -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-braille mr-2"></i>Dot Style</label>
+                    <div id="dot-styles" class="grid grid-cols-5 gap-2">
+                        <button class="style-btn active" data-dot="square" title="Square"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="4" y="4" width="16" height="16" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-dot="dots" title="Dots"><svg viewBox="0 0 24 24" class="w-8 h-8"><circle cx="12" cy="12" r="8" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-dot="rounded" title="Rounded"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="4" y="4" width="16" height="16" rx="5" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-dot="extra-rounded" title="Extra Rounded"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="4" y="4" width="16" height="16" rx="8" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-dot="classy-rounded" title="Classy"><svg viewBox="0 0 24 24" class="w-8 h-8"><path d="M4 12 L12 4 L20 12 L12 20Z" fill="currentColor"/></svg></button>
+                    </div>
+                </div>
+
+                <!-- Eye Style -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-eye mr-2"></i>Eye Style</label>
+                    <div id="eye-styles" class="grid grid-cols-4 gap-2">
+                        <button class="style-btn active" data-eye="square" title="Square"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="2" y="2" width="20" height="20" fill="none" stroke="currentColor" stroke-width="3"/><rect x="7" y="7" width="10" height="10" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-eye="dot" title="Dot"><svg viewBox="0 0 24 24" class="w-8 h-8"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-eye="extra-rounded" title="Rounded"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="2" y="2" width="20" height="20" rx="6" fill="none" stroke="currentColor" stroke-width="3"/><rect x="7" y="7" width="10" height="10" rx="3" fill="currentColor"/></svg></button>
+                        <button class="style-btn" data-eye="classy-rounded" title="Classy"><svg viewBox="0 0 24 24" class="w-8 h-8"><rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="12" cy="12" r="5" fill="currentColor"/></svg></button>
+                    </div>
+                </div>
+
+                <!-- Colors -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-palette mr-2"></i>Colors</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-xs text-gray-500 mb-1 block">Foreground</span>
+                            <div class="color-wrap">
+                                <input type="color" id="fg-color" value="#000000" class="color-input">
+                                <span id="fg-hex" class="text-xs text-gray-400">#000000</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 mb-1 block">Background</span>
+                            <div class="color-wrap">
+                                <input type="color" id="bg-color" value="#FFFFFF" class="color-input">
+                                <span id="bg-hex" class="text-xs text-gray-400">#FFFFFF</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Gradient Toggle -->
+                    <div class="mt-3 flex items-center justify-between">
+                        <span class="text-xs text-gray-500">Enable Gradient</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="gradient-toggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div id="gradient-opts" class="hidden mt-3 space-y-2">
+                        <div class="flex gap-3">
+                            <div class="flex-1">
+                                <span class="text-xs text-gray-500 mb-1 block">Gradient End</span>
+                                <div class="color-wrap">
+                                    <input type="color" id="grad-color" value="#7B61FF" class="color-input">
+                                    <span id="grad-hex" class="text-xs text-gray-400">#7B61FF</span>
+                                </div>
+                            </div>
+                            <div class="flex-1">
+                                <span class="text-xs text-gray-500 mb-1 block">Type</span>
+                                <select id="grad-type" class="qr-input text-xs py-1.5">
+                                    <option value="linear">Linear</option>
+                                    <option value="radial">Radial</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-image mr-2"></i>Logo</label>
+                    <div id="logo-drop" class="border-2 border-dashed border-white/10 rounded-lg p-4 text-center cursor-pointer hover:border-terminal/50 transition-colors">
+                        <input type="file" id="logo-file" accept="image/*" class="hidden">
+                        <div id="logo-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-500 mb-2"></i>
+                            <p class="text-xs text-gray-500">Drop logo here or click to upload</p>
+                        </div>
+                        <div id="logo-preview-wrap" class="hidden items-center gap-3">
+                            <img id="logo-thumb" class="w-12 h-12 rounded object-contain bg-white/10">
+                            <span id="logo-name" class="text-xs text-gray-400 flex-1 truncate"></span>
+                            <button id="logo-remove" class="text-red-400 hover:text-red-300 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Logo Size</span>
+                            <span id="logo-size-val">30%</span>
+                        </div>
+                        <input type="range" id="logo-size" min="10" max="40" value="30" class="slider">
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="panel">
+                    <button id="adv-toggle" class="panel-label w-full flex justify-between items-center cursor-pointer">
+                        <span><i class="fa-solid fa-gear mr-2"></i>Advanced</span>
+                        <i class="fa-solid fa-chevron-down text-xs transition-transform" id="adv-chevron"></i>
+                    </button>
+                    <div id="adv-body" class="hidden mt-3 space-y-3">
+                        <div>
+                            <span class="text-xs text-gray-500 mb-1 block">Error Correction</span>
+                            <select id="ec-level" class="qr-input text-xs">
+                                <option value="L">Low (7%) — Fastest scan</option>
+                                <option value="M">Medium (15%)</option>
+                                <option value="Q" selected>Quartile (25%) — Recommended with logo</option>
+                                <option value="H">High (30%) — Max durability</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>Margin</span>
+                                <span id="margin-val">10</span>
+                            </div>
+                            <input type="range" id="qr-margin" min="0" max="50" value="10" class="slider">
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500 mb-1 block">Output Size</span>
+                            <select id="qr-size" class="qr-input text-xs">
+                                <option value="512">512 × 512</option>
+                                <option value="1024" selected>1024 × 1024</option>
+                                <option value="2048">2048 × 2048</option>
+                                <option value="4096">4096 × 4096</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- end left panel -->
+
+            <!-- RIGHT: Preview & Export -->
+            <div class="flex-1 space-y-4">
+
+                <!-- Live Preview -->
+                <div class="panel sticky top-20">
+                    <div class="flex justify-between items-center mb-4">
+                        <label class="panel-label mb-0"><i class="fa-solid fa-qrcode mr-2"></i>Live Preview</label>
+                        <div id="scan-badge" class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-terminal/30 bg-terminal/10 text-terminal">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>Scannable</span>
+                        </div>
+                    </div>
+                    <div id="qr-preview" class="flex items-center justify-center bg-white rounded-xl p-6 min-h-[320px] relative overflow-hidden">
+                        <!-- QR renders here -->
+                    </div>
+                    <!-- Export Buttons -->
+                    <div class="mt-4 grid grid-cols-5 gap-2">
+                        <button class="export-btn" data-format="png" title="Download PNG">
+                            <i class="fa-solid fa-file-image"></i>
+                            <span>PNG</span>
+                        </button>
+                        <button class="export-btn" data-format="svg" title="Download SVG">
+                            <i class="fa-solid fa-bezier-curve"></i>
+                            <span>SVG</span>
+                        </button>
+                        <button class="export-btn" data-format="jpeg" title="Download JPEG">
+                            <i class="fa-solid fa-file"></i>
+                            <span>JPEG</span>
+                        </button>
+                        <button class="export-btn" data-format="webp" title="Download WebP">
+                            <i class="fa-solid fa-globe"></i>
+                            <span>WebP</span>
+                        </button>
+                        <button class="export-btn" id="copy-btn" title="Copy to Clipboard">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Copy</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent History -->
+                <div class="panel">
+                    <div class="flex justify-between items-center mb-3">
+                        <label class="panel-label mb-0"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Recent</label>
+                        <button id="clear-history" class="text-xs text-gray-500 hover:text-red-400 transition-colors">Clear</button>
+                    </div>
+                    <div id="history-grid" class="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-5 gap-2">
+                        <p id="history-empty" class="col-span-full text-xs text-gray-600 text-center py-4">No recent QR codes yet</p>
+                    </div>
+                </div>
+
+                <!-- Privacy Badge -->
+                <div class="flex items-center justify-center gap-2 text-xs text-gray-500 py-2">
+                    <i class="fa-solid fa-shield-halved text-terminal"></i>
+                    <span>Your data never leaves your browser. Zero tracking, zero servers.</span>
+                </div>
+            </div><!-- end right panel -->
+
+        </div><!-- end tool layout -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-void py-6 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p class="text-xs text-gray-500">&copy; 2026 Untitled Innovations. All Systems Operational.</p>
+            <div class="flex space-x-4 text-gray-500 text-xs">
+                <a href="/privacy-policy.html" class="hover:text-terminal">PRIVACY</a>
+                <a href="/terms-of-service.html" class="hover:text-terminal">TERMS</a>
+                <a href="/support.html" class="hover:text-terminal">SUPPORT</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+/* ==========================================
+   Magic QR — Styles
+   ========================================== */
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00FF94; }
+
+::selection { background: #00FF94; color: #050505; }
+
+/* ── Panels ── */
+.panel {
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    transition: border-color 0.3s ease;
+}
+.panel:hover {
+    border-color: rgba(0, 255, 148, 0.15);
+}
+.panel-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #EDEDED;
+    margin-bottom: 10px;
+}
+
+/* ── Inputs ── */
+.qr-input {
+    width: 100%;
+    background: #050505;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #EDEDED;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.qr-input:focus {
+    border-color: #00FF94;
+    box-shadow: 0 0 0 2px rgba(0, 255, 148, 0.15);
+}
+.qr-input::placeholder { color: #555; }
+
+select.qr-input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+select.qr-input option {
+    background: #0A0A0A;
+    color: #EDEDED;
+}
+
+/* ── Tab Buttons ── */
+.tab-btn {
+    padding: 6px 14px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: #888;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.tab-btn:hover {
+    color: #EDEDED;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+.tab-btn.active {
+    color: #050505;
+    background: #00FF94;
+    border-color: #00FF94;
+    box-shadow: 0 0 10px rgba(0, 255, 148, 0.3);
+}
+
+/* ── Tab Content ── */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* ── Style Picker Buttons ── */
+.style-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: #050505;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.style-btn:hover {
+    color: #EDEDED;
+    border-color: rgba(255, 255, 255, 0.25);
+}
+.style-btn.active {
+    color: #00FF94;
+    border-color: #00FF94;
+    box-shadow: 0 0 8px rgba(0, 255, 148, 0.2);
+}
+
+/* ── Color Input ── */
+.color-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #050505;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 4px 8px;
+}
+.color-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: none;
+}
+.color-input::-webkit-color-swatch-wrapper { padding: 0; }
+.color-input::-webkit-color-swatch { border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); }
+.color-input::-moz-color-swatch { border-radius: 5px; border: 1px solid rgba(255,255,255,0.2); }
+
+/* ── Toggle Switch ── */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background: #333;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background: #888;
+    border-radius: 50%;
+    transition: transform 0.3s, background 0.3s;
+}
+.toggle-switch input:checked + .toggle-slider {
+    background: rgba(0, 255, 148, 0.3);
+}
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+    background: #00FF94;
+}
+
+/* ── Range Slider ── */
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+    outline: none;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00FF94;
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0, 255, 148, 0.4);
+    transition: box-shadow 0.2s;
+}
+.slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 12px rgba(0, 255, 148, 0.6);
+}
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #00FF94;
+    cursor: pointer;
+    border: none;
+}
+
+/* ── Export Buttons ── */
+.export-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 4px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: #EDEDED;
+    background: #050505;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-transform: uppercase;
+}
+.export-btn i { font-size: 1rem; }
+.export-btn:hover {
+    border-color: #00FF94;
+    color: #00FF94;
+    box-shadow: 0 0 12px rgba(0, 255, 148, 0.2);
+    transform: translateY(-2px);
+}
+
+/* ── QR Preview Area ── */
+#qr-preview {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+#qr-preview canvas, #qr-preview svg {
+    max-width: 100%;
+    height: auto !important;
+    width: auto !important;
+    max-height: 400px;
+}
+
+/* ── Scan Badge States ── */
+#scan-badge.warn {
+    border-color: rgba(255, 200, 50, 0.3);
+    background: rgba(255, 200, 50, 0.1);
+    color: #FFC832;
+}
+#scan-badge.error {
+    border-color: rgba(255, 80, 80, 0.3);
+    background: rgba(255, 80, 80, 0.1);
+    color: #FF5050;
+}
+
+/* ── History Grid Items ── */
+.history-item {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 6px;
+    background: #fff;
+    padding: 3px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+.history-item:hover {
+    border-color: #00FF94;
+    transform: scale(1.08);
+    box-shadow: 0 0 10px rgba(0, 255, 148, 0.2);
+}
+.history-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ── Logo Drop Zone Active State ── */
+#logo-drop.drag-over {
+    border-color: #00FF94;
+    background: rgba(0, 255, 148, 0.05);
+}
+
+/* ── Copy Success Toast ── */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0, 255, 148, 0.15);
+    border: 1px solid rgba(0, 255, 148, 0.3);
+    backdrop-filter: blur(12px);
+    color: #00FF94;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+}
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+    .panel.sticky { position: static; }
+}

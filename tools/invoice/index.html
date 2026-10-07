@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Forge — Free Invoice Generator | Untitled Innovations</title>
+    <meta name="description" content="Create professional invoices in seconds. Add your logo, line items, tax and discounts, then export to PDF. 100% free, 100% private — runs entirely in your browser.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&family=Inter:wght@300..800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        void: '#050505',
+                        terminal: '#00FF94',
+                        code: '#7B61FF',
+                        ghost: '#EDEDED',
+                        surface: '#0A0A0A'
+                    },
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'neon': '0 0 5px #00FF94, 0 0 10px #00FF94',
+                        'neon-purple': '0 0 5px #7B61FF, 0 0 15px #7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- PDF / Canvas Export (bundles html2canvas + jsPDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="font-mono text-ghost antialiased relative bg-void view-edit">
+
+    <!-- Background Grid -->
+    <div class="fixed inset-0 z-0 opacity-10 pointer-events-none"
+         style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px;"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-40 top-0 bg-void/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="/" class="text-lg font-bold tracking-tighter hover:text-terminal transition-colors">
+                    <span class="text-terminal">></span> Untitled Innovations
+                </a>
+                <div class="flex items-center gap-6">
+                    <span class="hidden sm:inline text-xs text-gray-500 border border-white/10 px-3 py-1 rounded-full">
+                        <i class="fa-solid fa-lock text-terminal mr-1"></i> 100% Client-Side
+                    </span>
+                    <a href="/" class="text-sm text-gray-400 hover:text-terminal transition-colors">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="relative z-10 pt-20 pb-12 min-h-screen">
+        <!-- Hero -->
+        <div class="text-center px-4 pt-6 pb-8">
+            <h1 class="text-3xl md:text-5xl font-bold mb-3">
+                <span class="text-terminal">Invoice</span> Forge
+            </h1>
+            <p class="text-gray-400 text-sm md:text-base max-w-xl mx-auto">
+                Build clean, professional invoices with your own branding and export them to PDF. Free forever.
+            </p>
+        </div>
+
+        <!-- Mobile View Switcher -->
+        <div id="view-switch" class="view-switch lg:hidden">
+            <div class="view-switch-inner">
+                <button class="view-btn active" data-view="edit"><i class="fa-solid fa-pen-to-square mr-1.5"></i>Edit</button>
+                <button class="view-btn" data-view="preview"><i class="fa-solid fa-file-invoice mr-1.5"></i>Preview</button>
+                <span id="mini-total" class="mini-total"></span>
+            </div>
+        </div>
+
+        <!-- Tool Layout -->
+        <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row gap-6">
+
+            <!-- LEFT: Controls Panel -->
+            <div id="controls-col" class="lg:w-[460px] flex-shrink-0 space-y-4">
+
+                <!-- Template & Accent -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-swatchbook mr-2"></i>Template</label>
+                    <div id="template-picker" class="grid grid-cols-3 gap-2 mb-4">
+                        <button class="tpl-btn active" data-template="modern">
+                            <svg viewBox="0 0 40 52" class="w-full h-auto"><rect width="40" height="52" rx="2" fill="#fff"/><rect width="40" height="12" rx="2" fill="currentColor"/><rect x="5" y="19" width="16" height="2" fill="#bbb"/><rect x="5" y="24" width="12" height="2" fill="#ddd"/><rect x="5" y="33" width="30" height="1.5" fill="#eee"/><rect x="5" y="38" width="30" height="1.5" fill="#eee"/><rect x="23" y="45" width="12" height="2.5" fill="currentColor"/></svg>
+                            <span>Modern</span>
+                        </button>
+                        <button class="tpl-btn" data-template="classic">
+                            <svg viewBox="0 0 40 52" class="w-full h-auto"><rect width="40" height="52" rx="2" fill="#fff"/><rect x="5" y="6" width="18" height="3" fill="#333"/><rect x="5" y="12" width="10" height="2" fill="#bbb"/><rect x="5" y="20" width="30" height="1" fill="currentColor"/><rect x="5" y="26" width="30" height="1.5" fill="#eee"/><rect x="5" y="31" width="30" height="1.5" fill="#eee"/><rect x="5" y="36" width="30" height="1" fill="currentColor"/><rect x="23" y="42" width="12" height="2.5" fill="#333"/></svg>
+                            <span>Classic</span>
+                        </button>
+                        <button class="tpl-btn" data-template="minimal">
+                            <svg viewBox="0 0 40 52" class="w-full h-auto"><rect width="40" height="52" rx="2" fill="#fff"/><rect x="5" y="8" width="12" height="2" fill="#333"/><rect x="28" y="8" width="7" height="2" fill="currentColor"/><rect x="5" y="22" width="30" height="1" fill="#eee"/><rect x="5" y="28" width="30" height="1" fill="#eee"/><rect x="5" y="34" width="30" height="1" fill="#eee"/><rect x="26" y="42" width="9" height="2" fill="#333"/></svg>
+                            <span>Minimal</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 stack-sm">
+                        <div>
+                            <span class="field-label">Accent Colour</span>
+                            <div class="color-wrap">
+                                <input type="color" id="accent-color" value="#7B61FF" class="color-input">
+                                <span id="accent-hex" class="text-xs text-gray-400">#7B61FF</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="field-label">Status Stamp</span>
+                            <select id="inv-status" class="qr-input text-xs">
+                                <option value="">None</option>
+                                <option value="PAID">Paid</option>
+                                <option value="UNPAID">Unpaid</option>
+                                <option value="OVERDUE">Overdue</option>
+                                <option value="DRAFT">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Your Business -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-building mr-2"></i>From (Your Business)</label>
+
+                    <div id="logo-drop" class="border-2 border-dashed border-white/10 rounded-lg p-4 text-center cursor-pointer hover:border-terminal/50 transition-colors mb-3">
+                        <input type="file" id="logo-file" accept="image/*" class="hidden">
+                        <div id="logo-placeholder">
+                            <i class="fa-solid fa-cloud-arrow-up text-2xl text-gray-500 mb-2"></i>
+                            <p class="text-xs text-gray-500">Drop your logo here or click to upload</p>
+                        </div>
+                        <div id="logo-preview-wrap" class="hidden items-center gap-3">
+                            <img id="logo-thumb" class="w-12 h-12 rounded object-contain bg-white/10">
+                            <span id="logo-name" class="text-xs text-gray-400 flex-1 truncate"></span>
+                            <button id="logo-remove" class="text-red-400 hover:text-red-300 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                    </div>
+
+                    <input type="text" id="from-name" class="qr-input mb-2" placeholder="Business Name" data-bind="from.name">
+                    <textarea id="from-address" class="qr-input h-16 resize-none mb-2" placeholder="Street, City, State, ZIP" data-bind="from.address"></textarea>
+                    <div class="grid grid-cols-2 gap-2 stack-sm">
+                        <input type="email" id="from-email" class="qr-input" placeholder="Email" data-bind="from.email">
+                        <input type="tel" id="from-phone" class="qr-input" placeholder="Phone" data-bind="from.phone">
+                    </div>
+                    <input type="text" id="from-tax" class="qr-input mt-2" placeholder="Tax / GST / VAT ID (optional)" data-bind="from.taxId">
+                </div>
+
+                <!-- Bill To -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-user mr-2"></i>Bill To (Client)</label>
+                    <input type="text" id="to-name" class="qr-input mb-2" placeholder="Client Name" data-bind="to.name">
+                    <textarea id="to-address" class="qr-input h-16 resize-none mb-2" placeholder="Street, City, State, ZIP" data-bind="to.address"></textarea>
+                    <div class="grid grid-cols-2 gap-2 stack-sm">
+                        <input type="email" id="to-email" class="qr-input" placeholder="Email" data-bind="to.email">
+                        <input type="tel" id="to-phone" class="qr-input" placeholder="Phone" data-bind="to.phone">
+                    </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-file-invoice mr-2"></i>Invoice Details</label>
+                    <div class="grid grid-cols-2 gap-2 mb-2 stack-sm">
+                        <div>
+                            <span class="field-label">Invoice #</span>
+                            <input type="text" id="meta-number" class="qr-input" placeholder="INV-0001" data-bind="meta.number">
+                        </div>
+                        <div>
+                            <span class="field-label">PO / Reference</span>
+                            <input type="text" id="meta-po" class="qr-input" placeholder="Optional" data-bind="meta.po">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-2 stack-sm">
+                        <div>
+                            <span class="field-label">Issue Date</span>
+                            <input type="date" id="meta-date" class="qr-input" data-bind="meta.date">
+                        </div>
+                        <div>
+                            <span class="field-label">Due Date</span>
+                            <input type="date" id="meta-due" class="qr-input" data-bind="meta.due">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 stack-sm">
+                        <div>
+                            <span class="field-label">Currency</span>
+                            <select id="meta-currency" class="qr-input text-xs">
+                                <option value="USD">USD — US Dollar</option>
+                                <option value="EUR">EUR — Euro</option>
+                                <option value="GBP">GBP — Pound Sterling</option>
+                                <option value="INR">INR — Indian Rupee</option>
+                                <option value="AUD">AUD — Australian Dollar</option>
+                                <option value="CAD">CAD — Canadian Dollar</option>
+                                <option value="SGD">SGD — Singapore Dollar</option>
+                                <option value="AED">AED — UAE Dirham</option>
+                                <option value="JPY">JPY — Japanese Yen</option>
+                                <option value="CHF">CHF — Swiss Franc</option>
+                                <option value="ZAR">ZAR — South African Rand</option>
+                                <option value="BRL">BRL — Brazilian Real</option>
+                                <option value="CUSTOM">Custom Symbol…</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="field-label">Custom Symbol</span>
+                            <input type="text" id="meta-symbol" class="qr-input" placeholder="₿" maxlength="4" disabled data-bind="meta.symbol">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Line Items -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-list mr-2"></i>Line Items</label>
+                    <div class="item-head">
+                        <span>Description</span>
+                        <span>Qty</span>
+                        <span>Rate</span>
+                        <span>Amount</span>
+                        <span></span>
+                    </div>
+                    <div id="items-list" class="space-y-2"></div>
+                    <button id="add-item" class="ghost-btn w-full mt-3">
+                        <i class="fa-solid fa-plus mr-2"></i>Add Line Item
+                    </button>
+                </div>
+
+                <!-- Adjustments -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-calculator mr-2"></i>Tax & Adjustments</label>
+                    <div class="grid grid-cols-2 gap-2 mb-2 stack-sm">
+                        <div>
+                            <span class="field-label">Tax Label</span>
+                            <input type="text" id="tax-label" class="qr-input" placeholder="Tax" data-bind="taxLabel">
+                        </div>
+                        <div>
+                            <span class="field-label">Tax Rate (%)</span>
+                            <input type="number" id="tax-rate" class="qr-input" min="0" step="0.01" placeholder="0" data-bind="taxRate">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-2 stack-sm">
+                        <div>
+                            <span class="field-label">Discount</span>
+                            <div class="flex gap-2">
+                                <input type="number" id="discount-value" class="qr-input" min="0" step="0.01" placeholder="0" data-bind="discountValue">
+                                <select id="discount-type" class="qr-input w-20 text-xs">
+                                    <option value="percent">%</option>
+                                    <option value="flat">Flat</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="field-label">Shipping / Fees</span>
+                            <input type="number" id="shipping" class="qr-input" min="0" step="0.01" placeholder="0" data-bind="shipping">
+                        </div>
+                    </div>
+                    <div>
+                        <span class="field-label">Amount Paid / Deposit</span>
+                        <input type="number" id="amount-paid" class="qr-input" min="0" step="0.01" placeholder="0" data-bind="amountPaid">
+                    </div>
+                </div>
+
+                <!-- Notes & Terms -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-note-sticky mr-2"></i>Notes & Terms</label>
+                    <span class="field-label">Payment Details</span>
+                    <textarea id="payment-details" class="qr-input h-16 resize-none mb-2" placeholder="Bank name, account number, IFSC / SWIFT, UPI, PayPal…" data-bind="payment"></textarea>
+                    <span class="field-label">Notes</span>
+                    <textarea id="notes" class="qr-input h-16 resize-none mb-2" placeholder="Thanks for your business!" data-bind="notes"></textarea>
+                    <span class="field-label">Terms</span>
+                    <textarea id="terms" class="qr-input h-16 resize-none" placeholder="Payment due within 15 days. Late fees may apply." data-bind="terms"></textarea>
+                </div>
+
+                <!-- Data -->
+                <div class="panel">
+                    <label class="panel-label"><i class="fa-solid fa-database mr-2"></i>Data</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button id="new-invoice" class="ghost-btn"><i class="fa-solid fa-file-circle-plus mr-1"></i>New</button>
+                        <button id="export-json" class="ghost-btn"><i class="fa-solid fa-file-arrow-down mr-1"></i>Save</button>
+                        <button id="import-json" class="ghost-btn"><i class="fa-solid fa-file-arrow-up mr-1"></i>Load</button>
+                    </div>
+                    <input type="file" id="json-file" accept="application/json,.json" class="hidden">
+                    <p class="text-[0.65rem] text-gray-600 mt-3 leading-relaxed">
+                        Your work autosaves in this browser only. "Save" downloads a JSON file you can reload later or move to another device.
+                    </p>
+                </div>
+
+            </div><!-- end left panel -->
+
+            <!-- RIGHT: Preview & Export -->
+            <div id="preview-col" class="flex-1 min-w-0 space-y-4">
+
+                <div class="panel sticky top-20">
+                    <div class="flex justify-between items-center gap-2 flex-wrap mb-4">
+                        <label class="panel-label mb-0"><i class="fa-solid fa-eye mr-2"></i>Live Preview</label>
+                        <div class="flex items-center gap-2">
+                            <div class="zoom-group">
+                                <button class="zoom-btn active" data-zoom="fit" title="Fit to width">Fit</button>
+                                <button class="zoom-btn" data-zoom="full" title="Actual size">1:1</button>
+                            </div>
+                            <span id="page-badge" class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border border-terminal/30 bg-terminal/10 text-terminal">
+                                <i class="fa-solid fa-file-lines"></i>
+                                <span id="page-count">1 page</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="paper-viewport" class="paper-viewport">
+                        <div id="paper-scaler" class="paper-scaler">
+                            <div id="invoice-paper" class="inv-paper tpl-modern"><!-- rendered by app.js --></div>
+                        </div>
+                    </div>
+
+                    <!-- Export Buttons -->
+                    <div class="mt-4 grid grid-cols-4 gap-2">
+                        <button class="export-btn" id="dl-pdf" title="Download PDF">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>PDF</span>
+                        </button>
+                        <button class="export-btn" id="dl-png" title="Download PNG">
+                            <i class="fa-solid fa-file-image"></i>
+                            <span>PNG</span>
+                        </button>
+                        <button class="export-btn" id="do-print" title="Print">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Print</span>
+                        </button>
+                        <button class="export-btn" id="copy-total" title="Copy Total">
+                            <i class="fa-solid fa-copy"></i>
+                            <span>Total</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Privacy Badge -->
+                <div class="flex items-center justify-center gap-2 text-xs text-gray-500 py-2 text-center">
+                    <i class="fa-solid fa-shield-halved text-terminal"></i>
+                    <span>Your invoice data never leaves your browser. Zero tracking, zero servers.</span>
+                </div>
+            </div><!-- end right panel -->
+
+        </div><!-- end tool layout -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/10 bg-void py-6 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <p class="text-xs text-gray-500">&copy; 2026 Untitled Innovations. All Systems Operational.</p>
+            <div class="flex space-x-4 text-gray-500 text-xs">
+                <a href="/privacy-policy.html" class="hover:text-terminal">PRIVACY</a>
+                <a href="/terms-of-service.html" class="hover:text-terminal">TERMS</a>
+                <a href="/support.html" class="hover:text-terminal">SUPPORT</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
